@@ -1,30 +1,62 @@
-# DataAnalytics-Assessment
+# SQL Proficiency Assessment
 
-This repository contains SQL solutions for a Data Analyst Assessment. The queries are designed to solve real-world business problems using customer, savings, and investment data.
+This repository contains my responses to a SQL-based data analysis assessment designed to evaluate practical SQL skills, including data retrieval, aggregation, joins, subqueries, and reporting logic.
 
-## 🔍 Questions & Approaches
+## 👇 Overview of Solutions
 
-### Q1: High-Value Customers with Multiple Products
-**Goal:** Identify customers with both a funded savings plan and a funded investment plan.  
-**Approach:** Used `JOIN` and conditional filtering to count and aggregate deposits, sorted by total inflow.
+---
 
-### Q2: Transaction Frequency Analysis
-**Goal:** Segment customers based on average monthly transactions.  
-**Approach:** Aggregated transactions by customer/month, calculated averages, and classified into frequency categories using a CTE chain.
+### ✅ Question 1: High-Value Customers with Multiple Products
 
-### Q3: Account Inactivity Alert
-**Goal:** Flag accounts with no deposits in the past 365 days.  
-**Approach:** Used `MAX(transaction_date)` and filtered for older dates using `CURRENT_DATE - INTERVAL`.
+**Objective:** Identify customers with at least one funded savings plan and one funded investment plan, sorted by total deposits.
 
-### Q4: Customer Lifetime Value (CLV)
-**Goal:** Estimate CLV based on tenure and transactions.  
-**Approach:** Combined total transaction value with tenure to compute a simplified CLV formula.
+**Approach:**
+- Joined `users_customuser`, `savings_savingsaccount`, and `plans_plan` using `owner_id`.
+- Applied filters:
+  - `is_regular_savings = 1` for savings
+  - `is_a_fund = 1` for investments
+  - `confirmed_amount > 0` to ensure the plan is funded
+- Grouped by customer, counted products, and summed deposits.
+- Sorted by total deposit value (in naira).
 
-## 🧠 Challenges Faced
-- Ensuring data fields like `confirmed_amount` were normalized (amounts in kobo).
-- Distinguishing between savings and investment plans accurately using flags.
-- Handling division-by-zero in tenure calculation gracefully.
+**Efficiency:** Filtering and aggregations are scoped at join level to reduce intermediate rows early.
 
-## 💡 Notes
-- All monetary values were divided by 100 to convert kobo to Naira.
-- Assumed `transaction_date` exists in savings/investment tables (adjust if named differently).
+---
+
+### ✅ Question 2: Transaction Frequency Analysis
+
+**Objective:** Categorize customers based on their average monthly transaction count.
+
+**Approach:**
+- Aggregated total transactions per customer.
+- Divided by the number of distinct months active to compute monthly average.
+- Applied `CASE` logic to classify customers into:
+  - High Frequency (≥10/month)
+  - Medium Frequency (3–9/month)
+  - Low Frequency (≤2/month)
+
+**Efficiency:** Used `DATE_TRUNC` to normalize by month and grouped only necessary fields.
+
+---
+
+### ✅ Question 3: Account Inactivity Alert
+
+**Objective:** Flag all active plans/accounts with no inflow activity in the past 365 days.
+
+**Approach:**
+- Used `MAX(transaction_date)` to identify the last inflow.
+- Compared this against `CURRENT_DATE - 365`.
+- Filtered to accounts marked active with no recent inflow.
+
+**Efficiency:** Used `MAX()` aggregation on indexed timestamp fields to reduce scan size.
+
+---
+
+### ✅ Question 4: Customer Lifetime Value (CLV) Estimation
+
+**Objective:** Estimate each customer's CLV based on transaction history and account tenure.
+
+**Approach:**
+- Tenure calculated as months between signup and current date.
+- Total transactions and transaction value summed.
+- Applied the formula:
