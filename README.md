@@ -1,4 +1,4 @@
-# SQL Proficiency Assessment
+# SQL Assessment
 
 This repository contains my responses to a SQL-based data analysis assessment designed to evaluate practical SQL skills, including data retrieval, aggregation, joins, subqueries, and reporting logic.
 
